@@ -1,0 +1,232 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ui version="4.0">
+ <class>mainWindow</class>
+ <widget class="QMainWindow" name="mainWindow">
+  <property name="geometry">
+   <rect>
+    <x>0</x>
+    <y>0</y>
+    <width>681</width>
+    <height>594</height>
+   </rect>
+  </property>
+  <property name="sizePolicy">
+   <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
+    <horstretch>0</horstretch>
+    <verstretch>0</verstretch>
+   </sizepolicy>
+  </property>
+  <property name="minimumSize">
+   <size>
+    <width>681</width>
+    <height>594</height>
+   </size>
+  </property>
+  <property name="maximumSize">
+   <size>
+    <width>681</width>
+    <height>594</height>
+   </size>
+  </property>
+  <property name="windowTitle">
+   <string>Расчет оценки риска ИБ организации</string>
+  </property>
+  <property name="styleSheet">
+   <string notr="true">QLabel
+{
+  font-weight:bold;
+  font-size: 16px;
+}
+QPushButton:pressed{
+	background-color: green;
+}</string>
+  </property>
+  <property name="toolButtonStyle">
+   <enum>Qt::ToolButtonIconOnly</enum>
+  </property>
+  <property name="unifiedTitleAndToolBarOnMac">
+   <bool>false</bool>
+  </property>
+  <widget class="QWidget" name="centralwidget">
+   <layout class="QFormLayout" name="formLayout">
+    <property name="verticalSpacing">
+     <number>15</number>
+    </property>
+    <item row="0" column="0">
+     <widget class="QLabel" name="x1_label">
+      <property name="text">
+       <string>Программно-аппаратный уровень защиты:</string>
+      </property>
+     </widget>
+    </item>
+    <item row="0" column="1">
+     <widget class="QLineEdit" name="x1_lineEdit"/>
+    </item>
+    <item row="1" column="0">
+     <widget class="QLabel" name="x2_label">
+      <property name="text">
+       <string>Уровень организационной защиты:</string>
+      </property>
+     </widget>
+    </item>
+    <item row="1" column="1">
+     <widget class="QLineEdit" name="x2_lineEdit"/>
+    </item>
+    <item row="2" column="0">
+     <widget class="QLabel" name="x3_label">
+      <property name="text">
+       <string>Уровень правовой защиты:</string>
+      </property>
+     </widget>
+    </item>
+    <item row="2" column="1">
+     <widget class="QLineEdit" name="x3_lineEdit"/>
+    </item>
+    <item row="3" column="0">
+     <widget class="QLabel" name="x4_label">
+      <property name="text">
+       <string>Мотивация источника угроз:</string>
+      </property>
+     </widget>
+    </item>
+    <item row="3" column="1">
+     <widget class="QLineEdit" name="x4_lineEdit"/>
+    </item>
+    <item row="4" column="0">
+     <widget class="QLabel" name="x5_label">
+      <property name="text">
+       <string>Возможности источника угроз: </string>
+      </property>
+     </widget>
+    </item>
+    <item row="4" column="1">
+     <widget class="QLineEdit" name="x5_lineEdit"/>
+    </item>
+    <item row="5" column="0">
+     <widget class="QLabel" name="x6_label">
+      <property name="text">
+       <string>Рыночная ценность информационного
+ресурса:</string>
+      </property>
+     </widget>
+    </item>
+    <item row="5" column="1">
+     <widget class="QLineEdit" name="x6_lineEdit"/>
+    </item>
+    <item row="6" column="0">
+     <widget class="QLabel" name="X7_label">
+      <property name="text">
+       <string>Объем данных информационного ресурса
+организации:</string>
+      </property>
+     </widget>
+    </item>
+    <item row="6" column="1">
+     <widget class="QLineEdit" name="x7_lineEdit"/>
+    </item>
+    <item row="7" column="0">
+     <widget class="QLabel" name="empty_label">
+      <property name="text">
+       <string>TextLabel</string>
+      </property>
+     </widget>
+    </item>
+    <item row="8" column="0">
+     <widget class="QLabel" name="y_label">
+      <property name="text">
+       <string>Риск ИБ организации:</string>
+      </property>
+     </widget>
+    </item>
+    <item row="8" column="1">
+     <widget class="QLineEdit" name="y_lineEdit"/>
+    </item>
+    <item row="12" column="0">
+     <widget class="QPushButton" name="nn_button">
+      <property name="sizePolicy">
+       <sizepolicy hsizetype="Minimum" vsizetype="Fixed">
+        <horstretch>20</horstretch>
+        <verstretch>20</verstretch>
+       </sizepolicy>
+      </property>
+      <property name="styleSheet">
+       <string notr="true">QPushButton
+{
+  border: 2px solid gray;
+  border-radius: 5px;
+  padding: 0 8px;
+  background: white;
+  font-size: 20px;
+}</string>
+      </property>
+      <property name="text">
+       <string>Обучение сети</string>
+      </property>
+     </widget>
+    </item>
+    <item row="9" column="1">
+     <layout class="QHBoxLayout" name="horizontalLayout_2">
+      <property name="sizeConstraint">
+       <enum>QLayout::SetNoConstraint</enum>
+      </property>
+      <property name="leftMargin">
+       <number>3</number>
+      </property>
+      <property name="topMargin">
+       <number>20</number>
+      </property>
+      <property name="rightMargin">
+       <number>0</number>
+      </property>
+      <property name="bottomMargin">
+       <number>20</number>
+      </property>
+      <item>
+       <widget class="QPushButton" name="start_button">
+        <property name="enabled">
+         <bool>true</bool>
+        </property>
+        <property name="sizePolicy">
+         <sizepolicy hsizetype="Maximum" vsizetype="Minimum">
+          <horstretch>20</horstretch>
+          <verstretch>30</verstretch>
+         </sizepolicy>
+        </property>
+        <property name="layoutDirection">
+         <enum>Qt::LeftToRight</enum>
+        </property>
+        <property name="styleSheet">
+         <string notr="true">QPushButton
+{
+  border: 2px solid gray;
+  border-radius: 10px;
+  padding: 0 8px;
+  background: white;
+  font-size: 20px;
+}</string>
+        </property>
+        <property name="text">
+         <string>Произвести расчет риска
+ИБ организации</string>
+        </property>
+        <property name="icon">
+         <iconset>
+          <normaloff>../icons/neuron.png</normaloff>../icons/neuron.png</iconset>
+        </property>
+        <property name="iconSize">
+         <size>
+          <width>30</width>
+          <height>30</height>
+         </size>
+        </property>
+       </widget>
+      </item>
+     </layout>
+    </item>
+   </layout>
+  </widget>
+  <widget class="QStatusBar" name="statusbar"/>
+ </widget>
+ <resources/>
+ <connections/>
+</ui>

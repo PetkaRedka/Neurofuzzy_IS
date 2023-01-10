@@ -198,10 +198,14 @@ def ANFIS_learning(X, Y, epochs_num, save_file):
 def ANFIS_get_result(X1, X2, X3):
     
     # Загружаем веса
-    fourth_layer1 = torch.load("model1.pkl")
-    fourth_layer2 = torch.load("model2.pkl")
-    fourth_layer3 = torch.load("model3.pkl")
-    fourth_layer4 = torch.load("model4.pkl")
+    try:
+        fourth_layer1 = torch.load("model1.pkl")
+        fourth_layer2 = torch.load("model2.pkl")
+        fourth_layer3 = torch.load("model3.pkl")
+        fourth_layer4 = torch.load("model4.pkl")
+    
+    except BaseException:
+        return None
 
     def one_layer_result(X, fourth_layer):
 
@@ -249,7 +253,8 @@ def final_test():
         sum_loss += criterion(torch.tensor(predicted_result), torch.tensor(Y[i]))
         
     # Финальная ошибка на тестовых данных
-    print(sum_loss.item() / X1.shape[0])
+    # print(sum_loss.item() / X1.shape[0])
+    return (sum_loss.item() / X1.shape[0])
 
 
 # Функция для запуска обучения нейросети
@@ -271,7 +276,6 @@ def make_training(epoch_count):
 
     X4 = np.array([[Y1_predict[i], Y2_predict[i], Y3_predict[i]] for i in range(len(Y1_predict))])
     _, loss = ANFIS_learning(X4, Y4, epoch_count, "model4.pkl")
-    print(loss)
+    # print(loss)
 
-# make_training(10)
-final_test()
+    loss_after_tests = final_test()
