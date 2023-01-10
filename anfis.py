@@ -115,45 +115,99 @@ class ANFIS:
 
 
 # Четвертый слой (вынесен отдельно) - дефаззификация
-# Тут будут храниться обновленные веса, поэтому для удобства
-# Слой вынесен отдельно
+# Тут будут храниться обновленные веса, поэтому cлой вынесен отдельно
 class Fourth_layer(nn.Module):
 
     def __init__(self, input_size, num_classes):
 
         super(Fourth_layer, self).__init__()
-        self.fc1 = nn.Linear(input_size, 5)
+        self.fc1 = nn.Linear(input_size, num_classes)
         
     def forward(self, x):
         x = self.fc1(x)
         return x
 
 
-# Считаем наши тренировочные данные
-df = read_csv('learning_data.csv', sep=',', header=None)
-X = np.array(df.iloc[:, :-1].values)
-Y = np.array(df.iloc[:, -1].values)
-
-# Обозначим основные гиперпараметры
-epochs_num = 5
-lr = 0.01
-fourth_layer = Fourth_layer(3, 5)
-criterion = nn.MSELoss()
-optimizer = optim.Adam(fourth_layer.parameters(), lr=lr)
-L_train_acc = []
-loss = np.inf
-
-
-for epoch in range(epochs_num):
-
-    L_acc = 0.
+# Функция, обучющая нейросеть
+def ANFIS_learning(X, Y, epochs_num, save_file):
     
-    for i in range(X.shape[0]):
+    # Обозначим основные гиперпараметры
+    lr = 0.01
+    fourth_layer = Fourth_layer(X.shape[1], 5)
+    criterion = nn.MSELoss()
+    optimizer = optim.Adam(fourth_layer.parameters(), lr=lr)
+    L_train_acc = []
+    loss = np.inf
 
-        # ANFIS
-        x = torch.from_numpy(np.array(X[i]))
-        y = Y[i]
+
+    for epoch in range(epochs_num):
+
+        L_acc = 0.
+        answers = []
+
+        for i in range(X.shape[0]):
+
+            # ANFIS
+            x = torch.from_numpy(np.array(X[i]))
+            y = Y[i]
+            
+            # Инициализируем ANFIS (первые 3 слоя)
+            anfis = ANFIS(x)
+            # Фазифицируем
+            low_x, ave_x, high_x = anfis.fuzzification()
+            # Проходим через базу правил
+            rules = anfis.rule_base(low_x, ave_x, high_x)
+            # Нормализуем
+            normal_w = anfis.normaliztion(rules)
+            # Дефаззифицируем
+            y_h = fourth_layer(x.float())
+            # Складываем результат
+            y_fin = torch.sum(y_h * torch.from_numpy(normal_w))
+            
+            # Считываем ошибку
+            loss = criterion(y_fin, torch.tensor(y))
+
+            if isnan(loss):
+                answers.append(y)
+                continue
+
+            # Сумируем ошибку
+            L_acc += loss.item()
+
+            # Обратный проход с изменением весов
+            # (Обратное распространение ошибки)
+            optimizer.zero_grad()
+            loss.backward()
+            optimizer.step()
+
+            print("prediction:", y_fin.item())
+            print("true:", y)
+
+            # Сохраняем результаты текущей эпохи
+            answers.append(y_fin.item())
+
+        # Вычисляем среднюю ошибку эпохи
+        L_train_acc.append(L_acc / X.shape[0])
         
+    # Сохраняем модель после обучения
+    torch.save(fourth_layer, save_file)
+    return np.array(answers), L_train_acc
+
+
+
+def ANFIS_get_result(X1, X2, X3):
+    
+    # Загружаем веса
+    fourth_layer1 = torch.load("model1.pkl")
+    fourth_layer2 = torch.load("model2.pkl")
+    fourth_layer3 = torch.load("model3.pkl")
+    fourth_layer4 = torch.load("model4.pkl")
+
+    def one_layer_result(X, fourth_layer):
+
+        # Проходим всю сеть и получаем результат
+        x = torch.from_numpy(np.array(X))
+        # Инициализируем ANFIS (первые 3 слоя)
         anfis = ANFIS(x)
         # Фазифицируем
         low_x, ave_x, high_x = anfis.fuzzification()
@@ -165,25 +219,59 @@ for epoch in range(epochs_num):
         y_h = fourth_layer(x.float())
         # Складываем результат
         y_fin = torch.sum(y_h * torch.from_numpy(normal_w))
+
+        return y_fin.item()
+    
+    y1 = one_layer_result(X1, fourth_layer1)
+    y2 = one_layer_result(X2, fourth_layer2)
+    y3 = one_layer_result(X3, fourth_layer3)
+    y4 = one_layer_result(np.array([y1, y2, y3]), fourth_layer4)
+
+    return y4
+
+
+# Проверка на тестовом датасете
+def final_test():
+
+    df = read_csv('learning_data.csv', sep=',', header=None)
+    X1 = np.array(df.iloc[1000:, :3].values)
+    X2 = np.array(df.iloc[1000:, 4:6].values)
+    X3 = np.array(df.iloc[1000:, 7:9].values)
+    Y = np.array(df.iloc[1000:, -1].values)
+    
+    criterion = nn.MSELoss()
+    sum_loss = 0
+
+    # Посчитаем среднюю ошибку на тестовых данных
+    for i in range(X1.shape[0]):
         
-        # Считываем ошибку
-        loss = criterion(y_fin, torch.tensor(y))
+        predicted_result = ANFIS_get_result(X1[i], X2[i], X3[i])
+        sum_loss += criterion(torch.tensor(predicted_result), torch.tensor(Y[i]))
+        
+    # Финальная ошибка на тестовых данных
+    print(sum_loss.item() / X1.shape[0])
 
-        if isnan(loss):
-          continue
 
-        # Сумируем ошибку
-        L_acc += loss
+# Функция для запуска обучения нейросети
+def make_training(epoch_count):
 
-        # Обратный проход с изменением весов
-        # (Обратное распространение ошибки)
-        optimizer.zero_grad()
-        loss.backward()
-        optimizer.step()
+    # Считаем наши тренировочные данные
+    df = read_csv('learning_data.csv', sep=',', header=None)
+    X1 = np.array(df.iloc[:1000, :3].values)
+    Y1 = np.array(df.iloc[:1000, 3].values)
+    X2 = np.array(df.iloc[:1000, 4:6].values)
+    Y2 = np.array(df.iloc[:1000, 6].values)
+    X3 = np.array(df.iloc[:1000, 7:9].values)
+    Y3 = np.array(df.iloc[:1000, 9].values)
+    Y4 = np.array(df.iloc[:1000, -1].values)
 
-        print("prediction:", y_fin.item())
-        print("true:", y)
+    Y1_predict, _ = ANFIS_learning(X1, Y1, epoch_count, "model1.pkl")
+    Y2_predict, _ = ANFIS_learning(X2, Y2, epoch_count, "model2.pkl")
+    Y3_predict, _ = ANFIS_learning(X3, Y3, epoch_count, "model3.pkl")
 
-    L_train_acc.append(L_acc / X.shape[0])
+    X4 = np.array([[Y1_predict[i], Y2_predict[i], Y3_predict[i]] for i in range(len(Y1_predict))])
+    _, loss = ANFIS_learning(X4, Y4, epoch_count, "model4.pkl")
+    print(loss)
 
-print(L_train_acc)
+# make_training(10)
+final_test()

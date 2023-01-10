@@ -80,7 +80,7 @@ def compute_inputs(x1_input, x2_input, x3_input=None):
 
 
 def create_some_noise(y4):
-    return [round(random() / 1.5 + i, 3) for i in y4]
+    return [round(random() / 5 + i, 3) for i in y4]
 
 # Создает идеальные данные c шумами
 def create_ideal(size):
@@ -107,7 +107,8 @@ def create_ideal(size):
                             ideal_y1[i],
                             input_arr_y2[i][0], input_arr_y2[i][1],
                             ideal_y2[i],
-                            input_arr_y3[i][0], input_arr_y3[i][1], 
+                            input_arr_y3[i][0], input_arr_y3[i][1],
+                            ideal_y3[i], 
                             y4[i]])
 
 create_ideal(1300)
