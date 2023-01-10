@@ -19,6 +19,20 @@ class MembershipGraph(FigureCanvasQTAgg):
         super(MembershipGraph, self).__init__(fig)
 
 
+class MSGraphDialog(QDialog):
+    def __init__(self, loss, parent=None):
+        super(MSGraphDialog, self).__init__(parent)
+
+        sc = MembershipGraph(self, width=5, height=4, dpi=100)
+        sc.axes.plot(loss)
+
+        # Добавляем график на окно
+        self.verticalLayout = QVBoxLayout(self)
+        self.verticalLayout.setObjectName("verticalLayout")
+        self.verticalLayout.addWidget(sc)
+        self.setWindowTitle("График принадлежности")
+
+
 class GraphDialog(QDialog):
     def __init__(self, y_predicted, parent=None):
         super(GraphDialog, self).__init__(parent)
@@ -83,14 +97,26 @@ class Main(QMainWindow):
         self.Form = QWidget()
         self.learning_widget = Ui_Form()
         self.learning_widget.setupUi(self.Form)
+        self.learning_widget.graph_button.setEnabled(False)
 
         # Создадим стак окон
         self.ui.Stack.addWidget(self.Form)
       
-
+        # Логика кнопок
         self.ui.start_button.clicked.connect(self.start_program)
         self.ui.graph_button.clicked.connect(self.show_fuzz_graph)
         self.ui.nn_button.clicked.connect(self.nn_settings)
+
+        # Обозначим кнопку перехода в главное меню
+        self.learning_widget.back_button.clicked.connect(self.back_button)
+        # Обозначим кнопку запуска процесса обучения нейросети
+        self.learning_widget.learning_button.clicked.connect(self.nn_learning)
+        # Обозначим кнопку для вывода графика ошибки
+        self.learning_widget.graph_button.clicked.connect(self.show_ms_graph)
+
+
+        # Переменная для переобучения сети
+        self.loss = []
 
     def start_program(self):
         
@@ -141,19 +167,58 @@ class Main(QMainWindow):
         dialog = GraphDialog(y_predicted=float(self.ui.y_lineEdit.text()))
         dialog.exec_()
 
-
+    # Переходим на основной экран
     def back_button(self):
-        # Переходим на основной экран
         self.ui.Stack.setCurrentWidget(self.ui.centralwidget)
+
+    # Обучение сети
+    def nn_learning(self):
+        
+        # Проверка введенных данных
+        try:
+            epoch_num = int(self.learning_widget.epoch_lineEdit.text())
+            if 5000 < epoch_num or epoch_num < 0:
+                raise BaseException
+
+        except BaseException:
+            msgBox = QMessageBox()
+            msgBox.setIcon(QMessageBox.Information)
+            msgBox.setText("Поле заполнено неверно!")
+            msgBox.setWindowTitle("Ошибка заполнения")
+            msgBox.setStandardButtons(QMessageBox.Cancel)
+            returnValue = msgBox.exec()
+            return
+
+        # Чтобы ничего не сломалось, сначала заблокируем кнопку Назад
+        # self.learning_widget.back_button.setEnabled(False)
+        # Изменим статус на обучается
+        # self.learning_widget.process_label.setText('Обучение...\nПодождите, это может занять много времени.')
+
+
+        # Если все в порядке начинаем обучатся
+        loss, loss_trainng = make_training(epoch_num)
+
+        # Закончили обучение, отображаем значение ошибки
+        self.learning_widget.process_label.setText('\n'.join((str(i + 1) + "-ая эпоха:" + str(loss[i])) for i in range(len(loss))) \
+                                                     +  f'\nТестовые данные: {loss_trainng}')
+        # Разблокируем кнопку Назад
+        # self.learning_widget.back_button.setEnabled(True)
+        self.learning_widget.graph_button.setEnabled(True)
+
+        # Запоминаем значение ошибки
+        self.loss = loss
+
+
+    def show_ms_graph(self):
+        dialog = MSGraphDialog(loss=self.loss)
+        dialog.exec_()
 
 
     def nn_settings(self):
         
         # Переходим на новый экран
         self.ui.Stack.setCurrentWidget(self.Form)
-        
-        # Обозначим кнопку перехода в главное меню
-        self.learning_widget.back_button.clicked.connect(self.back_button)
+    
 
 
 if __name__ == "__main__":

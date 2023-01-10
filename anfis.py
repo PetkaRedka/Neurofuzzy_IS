@@ -20,11 +20,16 @@ class ANFIS:
         elif a <= x < b:
             return ((x - a) / (b - a))
         
+        elif x == c:
+            return 1
+
         elif b <= x <= c:
             return ((c - x) / (c - b))
-        
+
         elif x > c:
             return 0
+        
+
 
 
     # Первый слой - фазификация
@@ -180,9 +185,6 @@ def ANFIS_learning(X, Y, epochs_num, save_file):
             loss.backward()
             optimizer.step()
 
-            print("prediction:", y_fin.item())
-            print("true:", y)
-
             # Сохраняем результаты текущей эпохи
             answers.append(y_fin.item())
 
@@ -253,7 +255,6 @@ def final_test():
         sum_loss += criterion(torch.tensor(predicted_result), torch.tensor(Y[i]))
         
     # Финальная ошибка на тестовых данных
-    # print(sum_loss.item() / X1.shape[0])
     return (sum_loss.item() / X1.shape[0])
 
 
@@ -276,6 +277,8 @@ def make_training(epoch_count):
 
     X4 = np.array([[Y1_predict[i], Y2_predict[i], Y3_predict[i]] for i in range(len(Y1_predict))])
     _, loss = ANFIS_learning(X4, Y4, epoch_count, "model4.pkl")
-    # print(loss)
+
 
     loss_after_tests = final_test()
+    
+    return loss, loss_after_tests

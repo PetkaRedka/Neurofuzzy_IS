@@ -1,6 +1,5 @@
 from PyQt5 import QtCore, QtGui, QtWidgets
 
-
 class Ui_Form(object):
     def setupUi(self, Form):
         Form.setObjectName("Form")
@@ -52,9 +51,28 @@ class Ui_Form(object):
         self.learning_button.setObjectName("learning_button")
         self.horizontalLayout.addWidget(self.learning_button)
         self.formLayout.setLayout(1, QtWidgets.QFormLayout.FieldRole, self.horizontalLayout)
+
+        self.process_label = QtWidgets.QLabel(Form)
+        sizePolicy.setHeightForWidth(self.process_label.sizePolicy().hasHeightForWidth())
+        self.process_label.setSizePolicy(sizePolicy)
+        self.process_label.setObjectName("epoch_label")
+        self.formLayout.setWidget(2, QtWidgets.QFormLayout.FieldRole, self.process_label)
+
+        self.empty_label = QtWidgets.QLabel(Form)
+        sizePolicy.setHeightForWidth(self.empty_label.sizePolicy().hasHeightForWidth())
+        self.empty_label.setSizePolicy(sizePolicy)
+        self.empty_label.setObjectName("epoch_label")
+        self.formLayout.setWidget(3, QtWidgets.QFormLayout.FieldRole, self.empty_label)
+
         self.back_button = QtWidgets.QPushButton(Form)
         self.back_button.setObjectName("back_button")
-        self.formLayout.setWidget(3, QtWidgets.QFormLayout.LabelRole, self.back_button)
+        self.formLayout.setWidget(5, QtWidgets.QFormLayout.LabelRole, self.back_button)
+        
+        self.graph_button = QtWidgets.QPushButton(Form)
+        sizePolicy.setHeightForWidth(self.graph_button.sizePolicy().hasHeightForWidth())
+        self.graph_button.setSizePolicy(sizePolicy)
+        self.graph_button.setObjectName("graph_button")
+        self.formLayout.setWidget(4, QtWidgets.QFormLayout.FieldRole, self.graph_button)
 
         self.retranslateUi(Form)
         QtCore.QMetaObject.connectSlotsByName(Form)
@@ -63,8 +81,11 @@ class Ui_Form(object):
         _translate = QtCore.QCoreApplication.translate
         Form.setWindowTitle(_translate("Form", "Form"))
         self.epoch_label.setText(_translate("Form", "Количество эпох:"))
+        self.process_label.setText(_translate("Form", "Статус: Неактивно"))
+        self.empty_label.setText(_translate("Form", " "))
         self.learning_button.setText(_translate("Form", "Начать обучение"))
         self.back_button.setText(_translate("Form", "Назад"))
+        self.graph_button.setText(_translate("Form", "Показать график ошибки"))
 
 
 if __name__ == "__main__":
